@@ -1,0 +1,9 @@
+node_modules/
+
+# Ignore build artifacts
+dist/
+build/
+.webpack/
+.temp/
+.cache/
+.vscode/
