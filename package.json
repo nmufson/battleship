@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watchAll --bail=0",
     "watch": "webpack --watch",
     "start": "webpack serve --open",
     "build": "webpack",
@@ -22,7 +23,10 @@
   },
   "homepage": "https://github.com/nmufson/weather-app#readme",
   "devDependencies": {
+    "@babel/core": "^7.24.6",
+    "@babel/preset-env": "^7.24.6",
     "@eslint/js": "^9.2.0",
+    "babel-jest": "^29.7.0",
     "css-loader": "^7.1.1",
     "eslint": "^9.2.0",
     "globals": "^15.1.0",
