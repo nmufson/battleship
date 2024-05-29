@@ -1,15 +1,15 @@
 import { Ship } from "./ship";
 
 export class Gameboard {
-  constructor() {
+  constructor(gameInstance) {
     this.board = populateBoard();
     this.allSunkStatus = false;
     this.numberOfShips = 0;
     this.numberOfSunkenShips = 0;
+    this.gameInstance = gameInstance;
   }
 
   placeShip(rowSpaces, colSpaces, isVertical = true) {
-    this.numberOfShips = this.numberOfShips + 1;
     const length =
       1 +
       Math.max(...[rowSpaces[1] - rowSpaces[0], colSpaces[1] - colSpaces[0]]);
@@ -18,21 +18,27 @@ export class Gameboard {
     const startColumn = colSpaces[0];
     const startRow = rowSpaces[0];
 
-    if (this.checkForShip(rowSpaces, colSpaces, isVertical) === true) return;
+    if (this.checkForShip(rowSpaces, colSpaces, isVertical)) {
+      console.log("ship already there");
+      return;
+    }
+    this.numberOfShips = this.numberOfShips + 1;
 
     if (isVertical) {
       for (let i = startRow; i < length + startRow; i++) {
         this.board[i][startColumn].ship = ship;
+        this.gameInstance.styleShips(i, startColumn);
       }
     } else {
       for (let i = startColumn; i < length + startColumn; i++) {
         this.board[startRow][i].ship = ship;
+        this.gameInstance.styleShips(startRow, i);
       }
     }
   }
 
   checkForShip(rowSpaces, colSpaces, isVertical) {
-    const spaceOccupied = false;
+    let spaceOccupied = false;
     const startColumn = colSpaces[0];
     const startRow = rowSpaces[0];
     const length =

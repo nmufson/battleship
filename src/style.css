@@ -1,3 +1,45 @@
-/* body {
-  background-color: red;
-} */
+body {
+  display: grid;
+  grid-template-rows: 1fr 4fr;
+}
+
+.top-div {
+  display: flex;
+  justify-content: center;
+}
+
+.title-div {
+  display: flex;
+}
+
+.bottom-div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.bottom-left-div,
+.bottom-right-div {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  border: 1px black solid;
+}
+
+.row {
+  display: flex;
+}
+
+.square {
+  border: 1px black solid;
+  height: 40px;
+  width: 40px;
+}
+
+.ship {
+  background-color: blue;
+}

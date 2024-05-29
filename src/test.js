@@ -1,5 +1,6 @@
 import { Gameboard } from "./gameboard.js";
 import { Ship } from "./ship.js";
+import { FullGame } from "./dom-manipulation.js";
 
 test("return ship object containing length, number of times hit, and where theyre sunk or not", () => {
   expect(new Ship(4)).toEqual({
@@ -117,12 +118,40 @@ test("check if all ships on gameboard are sunk", () => {
   expect(gameboardOne.allSunk()).toBe(true);
 });
 
-test("check real and computer player instance (should have gameboard and win status", () => {
-  const playerOne = new Player("Nick");
-  const computerPlayer = new Player();
+test("create full game and check real and computer player instance (should have gameboard and win status", () => {
+  const newGame = new FullGame("Nick");
+  const gameboardTest = new Gameboard();
 
-  expect(playerOne.winStatus).toBe(false);
-  expect(playerOne.winStatus).toBe(false);
+  expect(newGame.winner).toBe(null);
 
-  expect(playerOne.gameboard).toEqual(gameboard);
+  expect(newGame.playerOne.gameboard).toEqual(gameboardTest);
+  expect(newGame.playerTwo.gameboard).toEqual(gameboardTest);
+
+  newGame.playerOne.gameboard.placeShip([2, 4], [5, 5], true);
+  newGame.playerOne.gameboard.placeShip([4, 8], [2, 2], true);
+  newGame.playerOne.gameboard.placeShip([8, 8], [4, 7], false);
+
+  newGame.playerOne.gameboard.receiveAttack(2, 5);
+  newGame.playerOne.gameboard.receiveAttack(3, 5);
+  newGame.playerOne.gameboard.receiveAttack(4, 5);
+  expect(newGame.playerOne.gameboard.board[3][5].ship.isSunk()).toBe(true);
+  expect(newGame.playerOne.gameboard.board[3][5].ship.timesHit).toBe(3);
+
+  newGame.playerOne.gameboard.receiveAttack(4, 2);
+  newGame.playerOne.gameboard.receiveAttack(5, 2);
+  newGame.playerOne.gameboard.receiveAttack(6, 2);
+  newGame.playerOne.gameboard.receiveAttack(7, 2);
+  newGame.playerOne.gameboard.receiveAttack(8, 2);
+  expect(newGame.playerOne.gameboard.board[6][2].ship.isSunk()).toBe(true);
+  expect(newGame.playerOne.gameboard.board[6][2].ship.timesHit).toBe(5);
+
+  newGame.playerOne.gameboard.receiveAttack(8, 4);
+  newGame.playerOne.gameboard.receiveAttack(8, 5);
+  newGame.playerOne.gameboard.receiveAttack(8, 6);
+  newGame.playerOne.gameboard.receiveAttack(8, 7);
+  expect(newGame.playerOne.gameboard.board[8][7].ship.isSunk()).toBe(true);
+  expect(newGame.playerOne.gameboard.board[8][7].ship.timesHit).toBe(4);
+  expect(newGame.playerOne.gameboard.allSunk()).toBe(true);
+  newGame.changeTurn();
+  expect(newGame.winner).toEqual(newGame.playerTwo);
 });
