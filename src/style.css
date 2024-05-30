@@ -1,6 +1,6 @@
 body {
   display: grid;
-  grid-template-rows: 1fr 4fr;
+  grid-template-rows: 1fr 4fr 1fr;
 }
 
 .top-div {
@@ -12,13 +12,13 @@ body {
   display: flex;
 }
 
-.bottom-div {
+.middle-div {
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
 
-.bottom-left-div,
-.bottom-right-div {
+.middle-left-div,
+.middle-right-div {
   display: flex;
   justify-content: center;
   justify-items: center;
@@ -42,4 +42,17 @@ body {
 
 .ship {
   background-color: blue;
+}
+
+.hit {
+  background-color: darkgray;
+}
+
+.hit.ship {
+  background-color: red;
+}
+
+.bottom-div {
+  display: flex;
+  justify-content: center;
 }

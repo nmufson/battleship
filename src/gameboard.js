@@ -1,12 +1,13 @@
 import { Ship } from "./ship";
 
 export class Gameboard {
-  constructor(gameInstance) {
+  constructor(playerInstance, gameInstance) {
     this.board = populateBoard();
     this.allSunkStatus = false;
     this.numberOfShips = 0;
     this.numberOfSunkenShips = 0;
     this.gameInstance = gameInstance;
+    this.playerInstance = playerInstance;
   }
 
   placeShip(rowSpaces, colSpaces, isVertical = true) {
@@ -27,12 +28,12 @@ export class Gameboard {
     if (isVertical) {
       for (let i = startRow; i < length + startRow; i++) {
         this.board[i][startColumn].ship = ship;
-        this.gameInstance.styleShips(i, startColumn);
+        this.gameInstance.styleShips(i, startColumn, this.playerInstance.name);
       }
     } else {
       for (let i = startColumn; i < length + startColumn; i++) {
         this.board[startRow][i].ship = ship;
-        this.gameInstance.styleShips(startRow, i);
+        this.gameInstance.styleShips(startRow, i, this.playerInstance.name);
       }
     }
   }
@@ -62,6 +63,7 @@ export class Gameboard {
     if (this.board[row][col].hitStatus === true) return;
     //change hit status to true and increment ship hits
     this.board[row][col].hitStatus = true;
+
     if (isObject(this.board[row][col].ship)) {
       this.board[row][col].ship.hit();
       if (
@@ -71,6 +73,16 @@ export class Gameboard {
         this.numberOfSunkenShips = this.numberOfSunkenShips + 1;
       }
     }
+
+    const squareDiv = document.querySelector(
+      `.row-${row}.col-${col}.${this.playerInstance.name}`,
+    );
+    squareDiv.classList.add("hit");
+    const board = document.querySelector(`.board.${this.playerInstance.name}`);
+    const rowArray = Array.from(board.children);
+    const squareArray = Array.from(rowArray[row].children);
+    if (squareArray.every((square) => square.classList.contains("hit")))
+      rowArray[row].classList.add("all-hit");
 
     if (this.numberOfSunkenShips === this.numberOfShips)
       this.allSunkStatus = true;
