@@ -13,6 +13,11 @@ export class FullGame {
   checkWinner() {
     if (this.playerOne.gameboard.allSunk()) this.winner = this.playerTwo;
     if (this.playerTwo.gameboard.allSunk()) this.winner = this.playerOne;
+
+    const gameMessageDiv = document.querySelector(".game-message");
+    const gameMessageP = gameMessageDiv.firstElementChild;
+
+    if (this.winner) gameMessageP.textContent = `${this.winner.name} wins!`;
   }
 
   createMainScreen() {
@@ -63,6 +68,88 @@ export class FullGame {
       this.playerTurn = this.playerOne;
       gameMessageP.textContent = `${this.playerOne.name}'s turn`;
     }
+  }
+
+  populatePlaceShipArea() {
+    const shipSelectDiv = document.querySelector(".ship-select");
+
+    const carrierDiv = this.createShipDom(5);
+    const battleshipDiv = this.createShipDom(4);
+    const cruiserDiv = this.createShipDom(3);
+    const submarineDiv = this.createShipDom(3);
+    const destroyerDiv = this.createShipDom(2);
+
+    carrierDiv.classList.add("carrier", "place-ship");
+    battleshipDiv.classList.add("battleship", "place-ship");
+    cruiserDiv.classList.add("cruiser", "place-ship");
+    submarineDiv.classList.add("submarine", "place-ship");
+    destroyerDiv.classList.add("destroyer", "place-ship");
+
+    shipSelectDiv.children[0].appendChild(carrierDiv);
+    shipSelectDiv.children[1].appendChild(battleshipDiv);
+    shipSelectDiv.children[2].appendChild(cruiserDiv);
+    shipSelectDiv.children[3].appendChild(submarineDiv);
+    shipSelectDiv.children[4].appendChild(destroyerDiv);
+
+    document.addEventListener("DOMContentLoaded", (event) => {
+      const placeShips = document.querySelectorAll(".place-ship");
+
+      placeShips.forEach((placeShip) => {
+        let ghost = null;
+
+        placeShip.addEventListener("mousedown", (e) => {
+          ghost = placeShip.cloneNode(true);
+          ghost.classList.add("ghost");
+          document.body.appendChild(ghost);
+
+          moveGhost(e);
+
+          document.addEventListener("mousemove", moveGhost);
+          document.addEventListener("mouseup", onMouseUp);
+        });
+
+        function moveGhost(e) {
+          if (ghost) {
+            ghost.style.left = e.clientX + "px";
+            ghost.style.top = e.clientY + "px";
+          }
+        }
+
+        const onMouseUp = (e) => {
+          // Remove the ghost element
+          if (ghost) {
+            const rowStart = Number(e.target.classList[0][4]);
+            const colStart = Number(e.target.classList[1][4]);
+            console.log(rowStart);
+            console.log(placeShip.children.length);
+
+            const rowEnd = rowStart + placeShip.children.length - 1;
+            console.log(rowEnd);
+            const colEnd = colStart;
+
+            this.playerOne.gameboard.placeShip(
+              [rowStart, rowEnd],
+              [colStart, colEnd],
+            );
+            ghost.remove();
+            ghost = null;
+          }
+          document.removeEventListener("mousemove", moveGhost);
+          document.removeEventListener("mouseup", onMouseUp);
+        };
+      });
+    });
+  }
+
+  createShipDom(numberOfSquares) {
+    const shipDiv = document.createElement("div");
+    for (let i = 0; i < numberOfSquares; i++) {
+      const square = document.createElement("div");
+      square.classList.add("place-square");
+      shipDiv.appendChild(square);
+    }
+
+    return shipDiv;
   }
 
   hitEventListener() {

@@ -27,9 +27,12 @@ newGame.playerTwo.gameboard.receiveAttack(7, 4);
 newGame.changeTurn();
 newGame.changeTurn();
 newGame.hitEventListener();
+newGame.populatePlaceShipArea();
 
 const title = document.querySelector(".title-div");
-title.addEventListener("click", () => console.log(newGame));
+title.addEventListener("click", () =>
+  console.log(newGame.playerOne.gameboard.board),
+);
 
 //need to know which player were placing ship on to style the appropriate board
 //perhaps pass the player instance to the game board?

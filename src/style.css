@@ -1,20 +1,33 @@
 body {
   display: grid;
-  grid-template-rows: 1fr 4fr 1fr;
+  grid-template-rows: 0.5fr 4fr 1.5fr;
+  height: 95vh;
 }
 
 .top-div {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
+  flex-direction: column;
+  align-content: center;
+  align-items: center;
 }
 
 .title-div {
   display: flex;
 }
 
+.title-div > h1 {
+  margin: 0;
+}
+
+/* .game-message > h3 {
+  
+} */
+
 .middle-div {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  width: 100%;
 }
 
 .middle-left-div,
@@ -22,22 +35,27 @@ body {
   display: flex;
   justify-content: center;
   justify-items: center;
+  width: 100%;
 }
 
 .board {
   display: flex;
   flex-direction: column;
   border: 1px black solid;
+  height: 90%;
+  width: 80%;
 }
 
 .row {
   display: flex;
+  height: 10%;
+  width: 100%;
 }
 
 .square {
   border: 1px black solid;
-  height: 40px;
-  width: 40px;
+  height: 100%;
+  width: 10%;
 }
 
 .ship {
@@ -55,4 +73,41 @@ body {
 .bottom-div {
   display: flex;
   justify-content: center;
+  width: 100%;
+}
+
+.ship-select {
+  width: 60%;
+  height: 100%;
+  border: black 2px solid;
+  display: flex;
+}
+
+.ship-select > div {
+  background-color: aliceblue;
+  width: 20%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.place-ship {
+  width: 30%;
+  border: 1px solid black;
+  cursor: pointer;
+}
+
+.place-square {
+  background-color: darkgray;
+  border: 1px solid black;
+  width: 100%;
+  height: 4vh;
+}
+
+.ghost {
+  position: absolute;
+  pointer-events: none;
+  width: 6vh;
+  height: 3vh;
 }
