@@ -10,7 +10,7 @@ export class Gameboard {
     this.playerInstance = playerInstance;
   }
 
-  placeShip(rowSpaces, colSpaces, isVertical = true) {
+  placeShip(rowSpaces, colSpaces, shipType, isVertical = true) {
     const length =
       1 +
       Math.max(...[rowSpaces[1] - rowSpaces[0], colSpaces[1] - colSpaces[0]]);
@@ -28,12 +28,22 @@ export class Gameboard {
     if (isVertical) {
       for (let i = startRow; i < length + startRow; i++) {
         this.board[i][startColumn].ship = ship;
-        this.gameInstance.styleShips(i, startColumn, this.playerInstance.name);
+        this.gameInstance.styleShips(
+          i,
+          startColumn,
+          this.playerInstance.name,
+          shipType,
+        );
       }
     } else {
       for (let i = startColumn; i < length + startColumn; i++) {
         this.board[startRow][i].ship = ship;
-        this.gameInstance.styleShips(startRow, i, this.playerInstance.name);
+        this.gameInstance.styleShips(
+          startRow,
+          i,
+          this.playerInstance.name,
+          shipType,
+        );
       }
     }
   }
