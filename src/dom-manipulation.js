@@ -8,6 +8,7 @@ export class FullGame {
     this.winner = null;
     this.playerTurn = this.playerOne;
     this.playerOneLegalCoordinates = this.playerOne.gameboard.board;
+    this.holdingGhost = false;
   }
 
   checkWinner() {
@@ -102,10 +103,6 @@ export class FullGame {
     });
   }
 
-  rotateShipListener() {
-    const placeShips = document.querySelectorAll("place-ship");
-  }
-
   computerTurn() {
     this.checkWinner();
     if (this.winner !== null) return;
@@ -133,6 +130,17 @@ export class FullGame {
     this.playerOne.gameboard.receiveAttack(rowNumber, colNumber);
   }
 
+  createShipDom(numberOfSquares) {
+    const shipDiv = document.createElement("div");
+    for (let i = 0; i < numberOfSquares; i++) {
+      const square = document.createElement("div");
+      square.classList.add("place-square");
+      shipDiv.appendChild(square);
+    }
+
+    return shipDiv;
+  }
+
   populatePlaceShipArea() {
     const shipSelectDiv = document.querySelector(".ship-select");
 
@@ -148,6 +156,12 @@ export class FullGame {
     submarineDiv.classList.add("submarine", "place-ship");
     destroyerDiv.classList.add("destroyer", "place-ship");
 
+    shipSelectDiv.children[0].classList.add("carrier", "container");
+    shipSelectDiv.children[1].classList.add("battleship", "container");
+    shipSelectDiv.children[2].classList.add("cruiser", "container");
+    shipSelectDiv.children[3].classList.add("submarine", "container");
+    shipSelectDiv.children[4].classList.add("destroyer", "container");
+
     shipSelectDiv.children[0].appendChild(carrierDiv);
     shipSelectDiv.children[1].appendChild(battleshipDiv);
     shipSelectDiv.children[2].appendChild(cruiserDiv);
@@ -157,103 +171,34 @@ export class FullGame {
     const placeShips = document.querySelectorAll(".place-ship");
 
     placeShips.forEach((placeShip) => {
-      let ghost = null;
-      const shipType = placeShip.classList[0];
-
-      placeShip.addEventListener("mousedown", (e) => {
-        ghost = placeShip.cloneNode(true);
-        ghost.classList.add("ghost");
-        document.body.appendChild(ghost);
-
-        moveGhost(e);
-
-        document.addEventListener("mousemove", moveGhost);
-        document.addEventListener("mouseup", onMouseUp);
-      });
-
-      function moveGhost(e) {
-        if (ghost) {
-          ghost.style.left = e.clientX + "px";
-          ghost.style.top = e.clientY + "px";
-        }
-      }
-
-      const onMouseUp = (e) => {
-        // Remove the ghost element
-        if (ghost) {
-          ghost.remove();
-          ghost = null;
-
-          const rowStart = Number(e.target.classList[0][4]);
-          const colStart = Number(e.target.classList[1][4]);
-
-          const rowEnd = rowStart + placeShip.children.length - 1;
-          const colEnd = colStart;
-
-          if (e.target.classList.contains(this.playerOne.name)) {
-            this.playerOne.gameboard.placeShip(
-              [rowStart, rowEnd],
-              [colStart, colEnd],
-              shipType,
-            );
-            this.addSelectShipListeners();
-            placeShip.remove();
-          }
-        }
-        document.removeEventListener("mousemove", moveGhost);
-        document.removeEventListener("mouseup", onMouseUp);
-      };
+      placeShip.addEventListener("click", (e) => this.grabShipFromStart(e));
     });
   }
 
-  createShipDom(numberOfSquares) {
-    const shipDiv = document.createElement("div");
-    for (let i = 0; i < numberOfSquares; i++) {
-      const square = document.createElement("div");
-      square.classList.add("place-square");
-      shipDiv.appendChild(square);
-    }
+  grabShipFromStart(e) {
+    e.stopPropagation();
+    if (this.holdingGhost) return;
+    this.holdingGhost = true;
 
-    return shipDiv;
+    const selectedShip = e.currentTarget;
+
+    let ghost = selectedShip.cloneNode(true);
+    ghost.classList.add("ghost");
+    document.body.appendChild(ghost);
+
+    selectedShip.remove();
+
+    this.moveGhost(e);
+
+    this.affectRotateButton();
+
+    document.addEventListener("mousemove", (e) => this.moveGhost(e));
+    document.addEventListener("click", (e) => this.placeShip(e));
   }
 
-  addSelectShipListeners() {
-    const shipSquares = document.querySelectorAll(".ship");
-    console.log(shipSquares);
-    shipSquares.forEach((shipSquare) => {
-      shipSquare.addEventListener("click", (e) => this.selectPlacedShip(e));
-    });
-  }
-
-  selectPlacedShip(e) {
-    // const selectedShipSquares = document.querySelectorAll(".selected");
-    // if (selectedShipSquares) {
-    //   selectedShipSquares.forEach((square) =>
-    //     square.classList.remove("selected"),
-    //   );
-    // }
-
-    const shipType = e.target.classList[5];
-
-    const shipSquares = document.querySelectorAll(`.${shipType}`);
-
-    const movingShip = document.createElement("div");
-    movingShip.classList.add("moving-ship");
-
-    shipSquares.forEach((shipSquare) => {
-      const movingShipSquare = document.createElement("div");
-      movingShip.appendChild(movingShipSquare);
-      shipSquare.classList.remove("ship");
-    });
-
-    document.body.appendChild(movingShip);
-
-    this.moveShip(e, movingShip);
-    document.addEventListener("mousemove", (e) => this.moveShip(e, movingShip));
-
-    //add listener to allow placing the ship, may need to move onMouseUp out of
-    //the function and make it a method
-    // movingShip.addEventListener("click"
+  affectRotateButton() {
+    const checkRotateButton = document.querySelector(".rotate");
+    if (checkRotateButton) return checkRotateButton.remove();
 
     const rotateButton = document.createElement("button");
     rotateButton.textContent = "rotate";
@@ -261,12 +206,142 @@ export class FullGame {
     document.body.appendChild(rotateButton);
   }
 
-  moveShip(e, movingShip) {
-    if (movingShip) {
-      movingShip.style.left = e.clientX + "px";
-      movingShip.style.top = e.clientY + "px";
+  moveGhost(e) {
+    e.stopPropagation();
+    if (!this.holdingGhost) return;
+    let ghost = document.querySelector(".ghost");
+    if (ghost) {
+      ghost.style.left = e.clientX + "px";
+      ghost.style.top = e.clientY + "px";
     }
   }
 
-  rotateShip() {}
+  placeShip(e) {
+    e.stopPropagation();
+    if (!this.holdingGhost) return;
+    this.holdingGhost = false;
+
+    let ghost = document.querySelector(".ghost");
+
+    if (ghost) {
+      const shipType = ghost.classList[0];
+      if (
+        !e.target.classList.contains(this.playerOne.name) ||
+        e.target.classList.contains("ship")
+      ) {
+        return;
+      }
+
+      const rowStart = Number(e.target.classList[0][4]);
+      const colStart = Number(e.target.classList[1][4]);
+
+      const rowEnd = rowStart + ghost.children.length - 1;
+      const colEnd = colStart;
+
+      ghost.remove();
+      ghost = null;
+
+      this.playerOne.gameboard.placeShip(
+        [rowStart, rowEnd],
+        [colStart, colEnd],
+        shipType,
+      );
+      this.addGrabShipFromBoardListeners();
+    }
+
+    this.affectRotateButton();
+  }
+
+  addGrabShipFromBoardListeners() {
+    const shipSquares = document.querySelectorAll(".ship");
+    shipSquares.forEach((shipSquare) => {
+      shipSquare.addEventListener("click", (e) => this.grabShipFromBoard(e));
+    });
+  }
+
+  //need to also change the position in the game board object
+  grabShipFromBoard(e) {
+    e.stopPropagation();
+    if (this.holdingGhost) return;
+    this.holdingGhost = true;
+
+    if (!e.target.classList.contains("ship")) return;
+
+    const shipType = e.target.classList[5];
+
+    const shipSquares = document.querySelectorAll(`.${shipType}.ship`);
+    const length = shipSquares.length;
+
+    const rowStart = Number(e.target.classList[0][4]);
+    const colStart = Number(e.target.classList[1][4]);
+    const rowEnd = rowStart + length - 1;
+    const colEnd = colStart;
+    let isVertical = true;
+    if (e.target.classList.contains("horizontal")) isVertical = false;
+
+    this.playerOne.gameboard.removeShip(
+      [rowStart, rowEnd],
+      [colStart, colEnd],
+      isVertical,
+    );
+
+    const ghost = document.createElement("div");
+    ghost.classList.add(shipType, "ghost");
+
+    shipSquares.forEach((shipSquare) => {
+      const ghostSquare = document.createElement("div");
+      ghostSquare.classList.add("place-square");
+      ghost.appendChild(ghostSquare);
+      shipSquare.classList.remove("ship");
+      shipSquare.classList.remove(shipType);
+    });
+
+    document.body.appendChild(ghost);
+
+    this.moveGhost(e);
+    document.addEventListener("mousemove", this.moveGhost);
+
+    this.affectRotateButton();
+
+    const rotateButton = document.querySelector(".rotate");
+    console.log(rotateButton);
+
+    rotateButton.addEventListener("click", this.rotateShip);
+  }
+
+  rotateShip() {
+    if (!this.holdingGhost) return;
+    const ghost = document.querySelector(".ghost");
+    if (ghost.classList.contains("horizontal"))
+      return ghost.classList.remove("horizontal");
+
+    ghost.classList.add("horizontal");
+  }
+
+  placeShipDom(e, shipType, length) {
+    e.stopPropagation();
+    if (!e.target.classList.contains(this.playerOne.name)) return;
+    console.log(shipType);
+    const ghost = document.querySelector(".ghost");
+    let isVertical = "true";
+    if (ghost.classList.contains("horizontal")) isVertical = false;
+    ghost.remove();
+
+    const rowStart = Number(e.target.classList[0][4]);
+    const colStart = Number(e.target.classList[1][4]);
+    const rowEnd = rowStart + length - 1;
+    const colEnd = colStart;
+
+    if (e.target.classList.contains(".ship")) return;
+
+    if (e.target.classList.contains(this.playerOne.name)) {
+      this.playerOne.gameboard.placeShip(
+        [rowStart, rowEnd],
+        [colStart, colEnd],
+        shipType,
+        isVertical,
+      );
+      this.dragging = true;
+    }
+  }
 }

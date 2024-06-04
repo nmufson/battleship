@@ -117,6 +117,7 @@ body {
   position: absolute;
   pointer-events: none;
   width: 6vh;
+  border: 1px solid black;
 }
 
 .moving-ship {
@@ -127,10 +128,20 @@ body {
   border: 1px solid black;
 }
 
-.moving-ship > div {
+.ghost > div {
   width: 6vh;
   height: 5vh;
   border: 1px black solid;
+}
+
+.horizontal {
+  display: flex;
+  height: 6vh;
+  width: auto;
+}
+
+.horizontal > div {
+  height: 6vh;
 }
 
 .selected {

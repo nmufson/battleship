@@ -68,6 +68,25 @@ export class Gameboard {
     return spaceOccupied;
   }
 
+  removeShip(rowSpaces, colSpaces, isVertical = true) {
+    const length =
+      1 +
+      Math.max(...[rowSpaces[1] - rowSpaces[0], colSpaces[1] - colSpaces[0]]);
+
+    const startColumn = colSpaces[0];
+    const startRow = rowSpaces[0];
+
+    if (isVertical) {
+      for (let i = startRow; i < length + startRow; i++) {
+        this.board[i][startColumn].ship = "none";
+      }
+    } else {
+      for (let i = startColumn; i < length + startColumn; i++) {
+        this.board[startRow][i].ship = "none";
+      }
+    }
+  }
+
   receiveAttack(row, col) {
     //first check if coordinate pair already hit/attacked
     if (this.board[row][col].hitStatus === true) return;
