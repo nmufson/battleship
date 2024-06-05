@@ -1,4 +1,4 @@
-import { Ship } from "./ship";
+import { Ship } from './ship';
 
 export class Gameboard {
   constructor(playerInstance, gameInstance) {
@@ -20,7 +20,7 @@ export class Gameboard {
     const startRow = rowSpaces[0];
 
     if (this.checkForShip(rowSpaces, colSpaces, isVertical)) {
-      console.log("ship already there");
+      console.log('ship already there');
       return;
     }
     this.numberOfShips = this.numberOfShips + 1;
@@ -33,6 +33,7 @@ export class Gameboard {
           startColumn,
           this.playerInstance.name,
           shipType,
+          isVertical
         );
       }
     } else {
@@ -43,6 +44,7 @@ export class Gameboard {
           i,
           this.playerInstance.name,
           shipType,
+          isVertical
         );
       }
     }
@@ -78,11 +80,11 @@ export class Gameboard {
 
     if (isVertical) {
       for (let i = startRow; i < length + startRow; i++) {
-        this.board[i][startColumn].ship = "none";
+        this.board[i][startColumn].ship = 'none';
       }
     } else {
       for (let i = startColumn; i < length + startColumn; i++) {
-        this.board[startRow][i].ship = "none";
+        this.board[startRow][i].ship = 'none';
       }
     }
   }
@@ -104,14 +106,14 @@ export class Gameboard {
     }
 
     const squareDiv = document.querySelector(
-      `.row-${row}.col-${col}.${this.playerInstance.name}`,
+      `.row-${row}.col-${col}.${this.playerInstance.name}`
     );
-    squareDiv.classList.add("hit");
+    squareDiv.classList.add('hit');
     const board = document.querySelector(`.board.${this.playerInstance.name}`);
     const rowArray = Array.from(board.children);
     const squareArray = Array.from(rowArray[row].children);
-    if (squareArray.every((square) => square.classList.contains("hit")))
-      rowArray[row].classList.add("all-hit");
+    if (squareArray.every((square) => square.classList.contains('hit')))
+      rowArray[row].classList.add('all-hit');
 
     if (this.numberOfSunkenShips === this.numberOfShips)
       this.allSunkStatus = true;
@@ -125,7 +127,7 @@ export class Gameboard {
 //check if value is object
 //typeof null returns 'object' so we need to make sure our value is also not null
 const isObject = (value) => {
-  return value !== null && typeof value === "object";
+  return value !== null && typeof value === 'object';
 };
 
 export const populateBoard = () => {
@@ -136,7 +138,7 @@ export const populateBoard = () => {
 
   arr.forEach((row) => {
     for (let i = 0; i < 10; i++) {
-      row.push({ hitStatus: false, ship: "none" });
+      row.push({ hitStatus: false, ship: 'none' });
     }
   });
 

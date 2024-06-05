@@ -100,13 +100,13 @@ body {
   transform: translate(-50%, -50%);
 }
 
-.place-ship {
+.starting-ship {
   width: 30%;
   border: 1px solid black;
   cursor: pointer;
 }
 
-.place-square {
+.starting-square {
   background-color: darkgray;
   border: 1px solid black;
   width: 100%;
@@ -134,13 +134,13 @@ body {
   border: 1px black solid;
 }
 
-.horizontal {
+.horizontal.ghost {
   display: flex;
   height: 6vh;
   width: auto;
 }
 
-.horizontal > div {
+.horizontal.ghost > div {
   height: 6vh;
 }
 
