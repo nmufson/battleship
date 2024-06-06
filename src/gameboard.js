@@ -8,6 +8,7 @@ export class Gameboard {
     this.numberOfSunkenShips = 0;
     this.gameInstance = gameInstance;
     this.playerInstance = playerInstance;
+    this.hitCount = 0;
   }
 
   placeShip(rowSpaces, colSpaces, shipType, isVertical = true) {
@@ -87,6 +88,7 @@ export class Gameboard {
         this.board[startRow][i].ship = 'none';
       }
     }
+    this.numberOfShips = this.numberOfShips - 1;
   }
 
   receiveAttack(row, col) {

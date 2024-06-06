@@ -28,24 +28,27 @@ const enterPlayerName = () => {
     const newGame = new FullGame(playerName);
 
     newGame.createMainScreen();
-    newGame.populatePlaceShipArea();
-    newGame.hitEventListener();
+    newGame.populateStartingShipArea();
+    newGame.addGrabShipFromStartListeners();
+    newGame.addGrabShipFromBoardListeners();
+    newGame.addPlaceShipListeners();
+    newGame.placeComputerShips();
 
     backgroundDiv.remove();
     nameDiv.remove();
   });
 };
 
-// enterPlayerName();
+enterPlayerName();
 
 const newGame = new FullGame('Nick');
 
-newGame.createMainScreen();
-newGame.populateStartingShipArea();
-newGame.hitEventListener();
-newGame.addGrabShipFromStartListeners();
-newGame.addGrabShipFromBoardListeners();
-newGame.addPlaceShipListeners();
+// newGame.createMainScreen();
+// newGame.populateStartingShipArea();
+// newGame.addGrabShipFromStartListeners();
+// newGame.addGrabShipFromBoardListeners();
+// newGame.addPlaceShipListeners();
+// newGame.placeComputerShips();
 
 // newGame.playerOne.gameboard.placeShip([1, 4], [2, 2], true); // 4
 // newGame.playerOne.gameboard.placeShip([6, 6], [3, 7], false); // 5

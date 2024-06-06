@@ -5,14 +5,21 @@ export class FullGame {
   constructor(playerOneName, playerTwoName = 'computer') {
     this.playerOne = new Player(this, 'real', playerOneName);
     this.playerTwo = new Player(this, 'computer');
-    this.winner = null;
-    this.playerTurn = this.playerOne;
-    this.playerOneLegalCoordinates = this.playerOne.gameboard.board;
-    this.holdingGhost = false;
+    this.initGameState();
+    this.bindMethods();
+  }
+
+  bindMethods() {
     this.placeShip = this.placeShip.bind(this);
     this.grabShipFromStart = this.grabShipFromStart.bind(this);
     this.grabShipFromBoard = this.grabShipFromBoard.bind(this);
     this.moveGhost = this.moveGhost.bind(this);
+  }
+
+  initGameState() {
+    this.winner = null;
+    this.playerTurn = this.playerOne;
+    this.holdingGhost = false;
   }
 
   checkWinner() {
@@ -77,7 +84,7 @@ export class FullGame {
     }
   }
 
-  hitEventListener() {
+  addHitEventListeners() {
     const boards = document.querySelectorAll('.board');
     boards.forEach((board) => {
       board.addEventListener('click', (event) => {
@@ -111,6 +118,13 @@ export class FullGame {
   computerTurn() {
     this.checkWinner();
     if (this.winner !== null) return;
+
+    //make computer target near successful hits
+    // const hits = document.querySelectorAll(`.hit.${this.playerOne.name}.ship`);
+    // const hitCount = hits.length;
+    // console.log(hitCount);
+    // let targetedShipCount = 0;
+    // let lastAttackSuccessful = false;
 
     const userBoard = document.querySelector(`.board.${this.playerOne.name}`);
     const rowArray = Array.from(userBoard.children);
@@ -212,11 +226,35 @@ export class FullGame {
     rotateButton.addEventListener('click', this.rotateShip);
   }
 
+  affectStartGameButton() {
+    const checkStartButton = document.querySelector('.start-game');
+    if (checkStartButton) return checkStartButton.remove();
+
+    const startButton = document.createElement('button');
+    startButton.textContent = 'Start Game';
+    startButton.classList.add('start-game');
+    document.body.appendChild(startButton);
+
+    startButton.addEventListener('click', () => {
+      this.startGame();
+      startButton.remove();
+    });
+  }
+
+  startGame() {
+    this.addHitEventListeners();
+    const playerSquares = document.querySelectorAll(`.square`);
+    playerSquares.forEach((square) => {
+      square.removeEventListener('click', this.grabShipFromBoard);
+      square.removeEventListener('click', this.placeShip);
+    });
+  }
+
   moveGhost(e) {
     let ghost = document.querySelector('.ghost');
     if (ghost) {
-      ghost.style.left = e.clientX + 'px';
-      ghost.style.top = e.clientY + 'px';
+      ghost.style.left = `${e.clientX}px`;
+      ghost.style.top = `${e.clientY}px`;
     }
   }
 
@@ -263,6 +301,43 @@ export class FullGame {
     }
 
     this.affectRotateButton();
+
+    if (this.playerOne.gameboard.numberOfShips === 5)
+      this.affectStartGameButton();
+  }
+
+  placeComputerShips(shipLengths = [], shipTypes = []) {
+    const startingShips = document.querySelectorAll('.starting-ship');
+    startingShips.forEach((ship) => shipLengths.push(ship.children.length));
+    startingShips.forEach((ship) => shipTypes.push(ship.classList[0]));
+
+    //only move to the next ship if we successfully placed the previous one
+    for (let i = 0; i < 5; ) {
+      this.placeShipRandom(shipLengths[i], shipTypes[i]);
+      if (this.playerTwo.gameboard.numberOfShips > i) i = i + 1;
+    }
+  }
+
+  placeShipRandom(length, shipType) {
+    const isVertical = Math.random() < 0.5;
+    const startRow = Math.floor(Math.random() * 10);
+    const startCol = Math.floor(Math.random() * 10);
+
+    let endRow = startRow;
+    let endCol = startCol;
+
+    if (isVertical) endRow = startRow + length - 1;
+    if (!isVertical) endCol = startCol + length - 1;
+
+    if (isVertical && startRow + length - 1 > 9) return;
+    if (!isVertical && startCol + length - 1 > 9) return;
+
+    this.playerTwo.gameboard.placeShip(
+      [startRow, endRow],
+      [startCol, endCol],
+      shipType,
+      isVertical
+    );
   }
 
   addGrabShipFromStartListeners() {
@@ -308,7 +383,9 @@ export class FullGame {
 
     const shipType = e.target.classList[5];
 
-    const shipSquares = document.querySelectorAll(`.${shipType}.ship`);
+    const shipSquares = document.querySelectorAll(
+      `.${shipType}.ship.${this.playerOne.name}`
+    );
     const length = shipSquares.length;
 
     const rowStart = Number(e.target.classList[0][4]);
@@ -351,6 +428,9 @@ export class FullGame {
       square.removeEventListener('click', this.grabShipFromBoard)
     );
 
+    if (this.playerOne.gameboard.numberOfShips > 3)
+      this.affectStartGameButton();
+
     this.affectRotateButton();
   }
 
@@ -361,31 +441,4 @@ export class FullGame {
 
     ghost.classList.add('horizontal');
   }
-
-  // placeShipDom(e, shipType, length) {
-  //   e.stopPropagation();
-  //   if (!e.target.classList.contains(this.playerOne.name)) return;
-  //   console.log(shipType);
-  //   const ghost = document.querySelector('.ghost');
-  //   let isVertical = 'true';
-  //   if (ghost.classList.contains('horizontal')) isVertical = false;
-  //   ghost.remove();
-
-  //   const rowStart = Number(e.target.classList[0][4]);
-  //   const colStart = Number(e.target.classList[1][4]);
-  //   const rowEnd = rowStart + length - 1;
-  //   const colEnd = colStart;
-
-  //   if (e.target.classList.contains('.ship')) return;
-
-  //   if (e.target.classList.contains(this.playerOne.name)) {
-  //     this.playerOne.gameboard.placeShip(
-  //       [rowStart, rowEnd],
-  //       [colStart, colEnd],
-  //       shipType,
-  //       isVertical
-  //     );
-  //     this.dragging = true;
-  //   }
-  // }
 }
